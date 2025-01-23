@@ -2,11 +2,12 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Extensions;
 
 namespace Umbraco.Community.BlockPreview.Extensions
 {
-    public static class BlockGridPreviewTemplateExtensions
+    public static class BlockPreviewTemplateExtensions
     {
         private static readonly string AREA_TEMPLATE =
             "<umb-block-grid-areas-container slot=\"areas\"></umb-block-grid-areas-container>";
@@ -67,10 +68,20 @@ namespace Umbraco.Community.BlockPreview.Extensions
         {
             if (html.ViewData.IsBlockGridPreview())
             {
-                return await Task.FromResult<IHtmlContent>(
-                        new HtmlContentBuilder()
-                            .AppendHtml($"<slot name=\"{template}\"></slot>")
-                    );
+                var matchingBlockConfig = html.ViewData["matchingBlockConfig"];
+
+                if (item.Areas.Any() && matchingBlockConfig is not null && matchingBlockConfig is BlockGridConfiguration.BlockGridBlockConfiguration blockConfig)
+                {
+                    var matchingArea = blockConfig.Areas.FirstOrDefault(x => x.Alias == template);
+
+                    if (matchingArea != null)
+                    {
+                        return await Task.FromResult<IHtmlContent>(
+                                new HtmlContentBuilder()
+                                    .AppendHtml($"<umb-block-grid-entries part=\"area\" class=\"umb-block-grid__area\" area-key=\"{matchingArea.Key}\"></umb-block-grid-entries>")
+                            );
+                    }
+                }
             }
 
             return await html.GetBlockGridItemAreaHtmlAsync(item, template);
@@ -80,10 +91,20 @@ namespace Umbraco.Community.BlockPreview.Extensions
         {
             if (html.ViewData.IsBlockGridPreview())
             {
-                return await Task.FromResult<IHtmlContent>(
-                        new HtmlContentBuilder()
-                            .AppendHtml($"<slot name=\"{template}\"></slot>")
-                    );
+                var matchingBlockConfig = html.ViewData["matchingBlockConfig"];
+
+                if (item.Areas.Any() && matchingBlockConfig is not null && matchingBlockConfig is BlockGridConfiguration.BlockGridBlockConfiguration blockConfig)
+                {
+                    var matchingArea = blockConfig.Areas.FirstOrDefault(x => x.Alias == template);
+
+                    if (matchingArea != null)
+                    {
+                        return await Task.FromResult<IHtmlContent>(
+                                new HtmlContentBuilder()
+                                    .AppendHtml($"<umb-block-grid-entries part=\"area\" class=\"umb-block-grid__area\" area-key=\"{matchingArea.Key}\"></umb-block-grid-entries>")
+                            );
+                    }
+                }
             }
 
             return await html.GetBlockGridItemAreaHtmlAsync(item, template);

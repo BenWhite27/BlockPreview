@@ -72,26 +72,8 @@ export class BlockGridPreviewCustomView
                 async ([unique, documentTypeUnique]) => {
                     this.unique = unique;
                     this.documentTypeUnique = documentTypeUnique;
-                    this.#observeBlockGridValue();
-                });
-        });
-    }
 
-    #observeBlockGridValue(): void {
-        this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
-            this.observe(
-                observeMultiple([context.alias, context.value]),
-                async ([alias, value]) => {
-                    this.blockEditorAlias = alias;
-
-                    this.blockGridValue = {
-                        ...this.blockGridValue,
-                        contentData: value.contentData!,
-                        settingsData: value.settingsData!,
-                        layout: value.layout!
-                    }
-
-                    this.#observeBlockValue();
+                    await this.#observeBlockValue();
                 });
         });
     }
@@ -106,7 +88,26 @@ export class BlockGridPreviewCustomView
                     this.contentElementType = contentElementType;
                     this.workspaceEditContentPath = workspaceEditContentPath;
 
-                    await this.#renderBlockPreview();
+                    await this.#observeBlockGridValue();
+                });
+        });
+    }
+
+    #observeBlockGridValue(): void {
+        this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
+            this.observe(
+                observeMultiple([context.alias, context.value]),
+                async ([alias, value]) => {
+                    this.blockEditorAlias = alias;
+
+                    this.blockGridValue = {
+                        ...this.blockGridValue,
+                        contentData: value.contentData?.filter(x => x.udi == this.contentUdi)! ?? [],
+                        settingsData: value.settingsData?.filter(x => x.udi == this.settingsUdi)! ?? [],
+                        layout: { ['Umbraco.BlockGrid']: value.layout['Umbraco.BlockGrid']?.filter(x => x.contentUdi == this.contentUdi)! ?? [] }
+                    }
+
+                    this.#renderBlockPreview();
                 });
         });
     }

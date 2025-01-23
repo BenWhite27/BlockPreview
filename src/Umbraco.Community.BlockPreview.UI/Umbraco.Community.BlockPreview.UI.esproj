@@ -5,4 +5,9 @@
     <StaticWebAssetSourceId>Umbraco.Community.BlockPreview</StaticWebAssetSourceId>
     <DebugAssetsDirectory>$(MSBuildProjectDirectory)\dist</DebugAssetsDirectory>
   </PropertyGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties package_1json__JsonSchema="" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>
