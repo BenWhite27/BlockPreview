@@ -8,12 +8,13 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
-using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.HybridCache;
 using Umbraco.Community.BlockPreview.Interfaces;
 using Umbraco.Community.BlockPreview.Services;
 using Umbraco.Extensions;
@@ -33,7 +34,6 @@ namespace Umbraco.Community.BlockPreview.Controllers
         private readonly ContextCultureService _contextCultureService;
         private readonly IBlockPreviewService _blockPreviewService;
         private readonly ILanguageService _languageService;
-        private readonly ISiteDomainMapper _siteDomainMapper;
         private readonly BlockPreviewOptions _blockPreviewSettings;
         private readonly IAppPolicyCache _runtimeCache;
         private readonly ITypeFinder _typeFinder;
@@ -58,7 +58,6 @@ namespace Umbraco.Community.BlockPreview.Controllers
             ContextCultureService contextCultureSwitcher,
             IBlockPreviewService blockPreviewService,
             ILanguageService languageService,
-            ISiteDomainMapper siteDomainMapper,
             IOptionsMonitor<BlockPreviewOptions> blockPreviewSettings,
             ITypeFinder typeFinder,
             AppCaches appCaches)
@@ -69,7 +68,6 @@ namespace Umbraco.Community.BlockPreview.Controllers
             _contextCultureService = contextCultureSwitcher;
             _blockPreviewService = blockPreviewService;
             _languageService = languageService;
-            _siteDomainMapper = siteDomainMapper;
             _blockPreviewSettings = blockPreviewSettings.CurrentValue;
             _typeFinder = typeFinder;
             _runtimeCache = appCaches.RuntimeCache;
@@ -254,7 +252,7 @@ namespace Umbraco.Community.BlockPreview.Controllers
         {
             // if in a culture variant setup also set the correct language.
             var currentCulture = string.IsNullOrWhiteSpace(culture)
-               ? content?.GetCultureFromDomains(_umbracoContextAccessor, _siteDomainMapper)
+               ? content?.GetCultureFromDomains()
                : culture;
 
             if (string.IsNullOrEmpty(currentCulture) || culture == "undefined")

@@ -1,19 +1,20 @@
 import type { UmbBlockEditorCustomViewElement } from '@umbraco-cms/backoffice/block-custom-view';
 import { UMB_BLOCK_GRID_ENTRY_CONTEXT, UMB_BLOCK_GRID_MANAGER_CONTEXT, UmbBlockGridValueModel } from "@umbraco-cms/backoffice/block-grid";
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from "@umbraco-cms/backoffice/document";
-import { css, customElement, html, ifDefined, property, state, unsafeHTML } from "@umbraco-cms/backoffice/external/lit";
-import { UmbLitElement } from "@umbraco-cms/backoffice/lit-element";
+import { LitElement, css, customElement, html, ifDefined, property, state, unsafeHTML } from "@umbraco-cms/backoffice/external/lit";
 import { observeMultiple } from "@umbraco-cms/backoffice/observable-api";
 import { UMB_PROPERTY_DATASET_CONTEXT } from "@umbraco-cms/backoffice/property";
 import { tryExecuteAndNotify } from "@umbraco-cms/backoffice/resources";
 import { BlockPreviewService, PreviewGridBlockData } from "../api";
 import { BLOCK_PREVIEW_CONTEXT } from "../context/block-preview.context-token";
+import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
+import { UmbBlockDataType } from '@umbraco-cms/backoffice/block';
 
 const elementName = "block-grid-preview";
 
 @customElement(elementName)
 export class BlockGridPreviewCustomView
-    extends UmbLitElement
+    extends UmbElementMixin(LitElement)
     implements UmbBlockEditorCustomViewElement {
 
     @state()
@@ -26,6 +27,9 @@ export class BlockGridPreviewCustomView
     private _error: string | null = null;
 
     private _styleElement?: HTMLLinkElement;
+
+    @property({ attribute: false })
+    content?: UmbBlockDataType;
 
     private _blockContext = {
         unique: '',
@@ -159,6 +163,7 @@ export class BlockGridPreviewCustomView
     }
 
     async #renderBlockPreview() {
+        console.log(this.content);
         const context = this._blockContext;
         const isDataValid = this.#validatePreviewData(context);
 
